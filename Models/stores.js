@@ -9,9 +9,9 @@ const StoreSchema = new Schema(
             type: String,
             required: true
         },
-        address: { String, required: true },
-        phone: { String, required: true },
-        email: { String, required: true },
+        address: { type: String, required: true },
+        phone: { type: String, required: true },
+        email: { type: String, required: true },
     },
     { collection: 'Stores' }
 );

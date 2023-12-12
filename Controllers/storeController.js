@@ -19,7 +19,7 @@ exports.CreateStore = async (req, res) => {
     res.json({ status: 'success', Stores: response });
 }
 
-exports.EditServiceAddress = async (req, res) => {
+exports.EditStore = async (req, res) => {
     try {
         const { newAdress } = req.body;
         const { id } = req.query;
