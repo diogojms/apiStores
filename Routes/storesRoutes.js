@@ -33,7 +33,7 @@ function isAdmin(req, res, next) {
 }
 
 router.post('/CreateStore', checkToken, isAdmin, storeController.CreateStore);
-router.post('/EditStore/', checkToken, isAdmin, storeController.EditStore);
+router.post('/EditStore', checkToken, isAdmin, storeController.EditStore);
 router.post('/RemoveStore', checkToken, isAdmin, storeController.RemoveStore);
 router.get('/ReadStore', checkToken, isAdmin, storeController.ReadStore);
 router.get('/ReadStores', checkToken, isAdmin, storeController.ReadStores);

@@ -21,22 +21,23 @@ exports.CreateStore = async (req, res) => {
 
 exports.EditStore = async (req, res) => {
     try {
-        const { newAdress } = req.body;
+        const { newAddress } = req.body;
         const { id } = req.query;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Id da loja inválido' });
+            return res.status(400).json({ msg: 'Id da loja inválido' });
         }
 
-        if (!newAdress) {
-            return res.status(400).json({ message: 'O campo "Address" é obrigatório' });
+        if (!newAddress) {
+            return res.status(400).json({ msg: 'O campo "Address" é obrigatório' });
         }
 
-        const updateStore = await Stores.findByIdAndUpdate(id, { address: newAdress }, { new: true });
+        const updateStore = await Stores.findByIdAndUpdate(id, { address: newAddress }, { new: true });
 
         if (!updateStore) {
-            return res.status(400).json({ message: 'Loja não encontrada' });
+            return res.status(404).json({ msg: 'Loja não encontrada' });
         }
+        res.json({ status: 'success', store: updateStore })
     } catch (error) {
         console.error('Erro ao atualizar endereço da loja: ', error);
         res.status(500).json({ msg: 'Erro interno do servidor' });
@@ -44,13 +45,13 @@ exports.EditStore = async (req, res) => {
 };
 
 exports.RemoveStore = async (req, res) => {
-    const { storeID } = req.query;
+    const { id } = req.query;
 
-    if (!storeID) {
+    if (!id) {
         return res.status(400).json({ message: 'Invalid Store ID' });
     }
 
-    const store = await Stores.findById(storeID);
+    const store = await Stores.findById(id);
 
     if (!store) {
         return res.status(400).json({ message: 'Store not found' });
@@ -62,13 +63,13 @@ exports.RemoveStore = async (req, res) => {
 }
 
 exports.ReadStore = async (req, res) => {
-    const { storeID } = req.query;
+    const { id } = req.query;
 
-    if (!storeID) {
+    if (!id) {
         return res.status(400).json({ message: 'Invalid Store ID' });
     }
 
-    const store = await Stores.findById(storeID);
+    const store = await Stores.findById(id);
     if (!store) {
         return res.status(400).json({ message: 'Store not found' });
     }
