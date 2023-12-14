@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const storeController = require('../controllers/storeController');
+const storeController = require('../Controllers/storeController');
 const jwt = require('jsonwebtoken');
 
 function checkToken(req, res, next) {
