@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 /**
  * @swagger
- * /stores/create:
+ * /CreateStore:
  *   post:
  *     summary: Create a new store
  *     description: Endpoint to create a new store.
@@ -69,7 +69,7 @@ exports.CreateStore = async (req, res) => {
 
 /**
  * @swagger
- * /stores/edit:
+ * /EditStore:
  *   put:
  *     summary: Edit store information
  *     description: Endpoint to edit the information of an existing store.
@@ -139,7 +139,7 @@ exports.EditStore = async (req, res) => {
 
 /**
  * @swagger
- * /stores/remove:
+ * /RemoveStore:
  *   delete:
  *     summary: Remove a store
  *     description: Endpoint to remove an existing store.
@@ -193,7 +193,7 @@ exports.RemoveStore = async (req, res) => {
 
 /**
  * @swagger
- * /stores/read:
+ * /ReadStore:
  *   get:
  *     summary: Get store information
  *     description: Endpoint to retrieve information for an existing store.
@@ -244,7 +244,7 @@ exports.ReadStore = async (req, res) => {
 
 /**
  * @swagger
- * /stores/readAll:
+ * /ReadStores:
  *   get:
  *     summary: Get all stores
  *     description: Endpoint to retrieve information for all existing stores.
