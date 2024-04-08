@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 /**
  * @swagger
- * /CreateStore:
+ * /:
  *   post:
  *     summary: Create a new store
  *     description: Endpoint to create a new store.
@@ -69,7 +69,7 @@ exports.CreateStore = async (req, res) => {
 
 /**
  * @swagger
- * /EditStore:
+ * /:
  *   put:
  *     summary: Edit store information
  *     description: Endpoint to edit the information of an existing store.
@@ -90,6 +90,12 @@ exports.CreateStore = async (req, res) => {
  *           type: object
  *           properties:
  *             newAddress:
+ *               type: string
+ *             newName:
+ *               type: string
+ *             newPhone:
+ *               type: string
+ *             newEmail:
  *               type: string
  *     responses:
  *       '200':
@@ -114,32 +120,47 @@ exports.CreateStore = async (req, res) => {
  */
 exports.EditStore = async (req, res) => {
     try {
-        const { newAddress } = req.body;
+        const { newAddress, newName, newPhone, newEmail } = req.body;
         const { id } = req.query;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ msg: 'Id da loja inválido' });
+            return res.status(400).json({ msg: 'Invalid Store ID' });
         }
 
-        if (!newAddress) {
-            return res.status(400).json({ msg: 'O campo "Address" é obrigatório' });
+        if (!newAddress && !newName && !newPhone && !newEmail) {
+            return res.status(400).json({ msg: 'At least one field must be provided' });
         }
 
-        const updateStore = await Stores.findByIdAndUpdate(id, { address: newAddress }, { new: true });
-
-        if (!updateStore) {
-            return res.status(404).json({ msg: 'Loja não encontrada' });
+        const updateFields = {};
+        if (newAddress) {
+            updateFields.address = newAddress;
         }
-        res.json({ status: 'success', store: updateStore })
+        if (newName) {
+            updateFields.name = newName;
+        }
+        if (newPhone) {
+            updateFields.phone = newPhone;
+        }
+        if (newEmail) {
+            updateFields.email = newEmail;
+        }
+
+        const updatedStore = await Stores.findByIdAndUpdate(id, updateFields, { new: true });
+
+        if (!updatedStore) {
+            return res.status(404).json({ msg: 'Store not found' });
+        }
+
+        res.json({ status: 'success', store: updatedStore });
     } catch (error) {
-        console.error('Erro ao atualizar endereço da loja: ', error);
-        res.status(500).json({ msg: 'Erro interno do servidor' });
+        console.error('Error updating store information: ', error);
+        res.status(500).json({ msg: 'Internal Server Error' });
     }
 };
 
 /**
  * @swagger
- * /RemoveStore:
+ * /:
  *   delete:
  *     summary: Remove a store
  *     description: Endpoint to remove an existing store.
@@ -193,7 +214,7 @@ exports.RemoveStore = async (req, res) => {
 
 /**
  * @swagger
- * /ReadStore:
+ * /ReadStore/{id}:
  *   get:
  *     summary: Get store information
  *     description: Endpoint to retrieve information for an existing store.
@@ -201,7 +222,7 @@ exports.RemoveStore = async (req, res) => {
  *       - Stores
  *     parameters:
  *       - name: id
- *         in: query
+ *         in: path
  *         description: ID of the store to retrieve information
  *         required: true
  *         schema:
@@ -228,7 +249,7 @@ exports.RemoveStore = async (req, res) => {
  *         description: Internal Server Error - Failed to retrieve store information
  */
 exports.ReadStore = async (req, res) => {
-    const { id } = req.query;
+    const { id } = req.params;
 
     if (!id) {
         return res.status(400).json({ message: 'Invalid Store ID' });
@@ -244,12 +265,29 @@ exports.ReadStore = async (req, res) => {
 
 /**
  * @swagger
- * /ReadStores:
+ * /:
  *   get:
  *     summary: Get all stores
  *     description: Endpoint to retrieve information for all existing stores.
  *     tags:
  *       - Stores
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         description: Page number
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *       - name: limit
+ *         in: query
+ *         description: Number of stores per page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           minimum: 1
+ *           maximum: 100
+ *           default: 20
  *     responses:
  *       '200':
  *         description: Stores information retrieved successfully
@@ -270,6 +308,22 @@ exports.ReadStore = async (req, res) => {
  *         description: Internal Server Error - Failed to retrieve stores information
  */
 exports.ReadStores = async (req, res) => {
-    const stores = await Stores.find();
-    res.json({ status: 'success', stores: stores });
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    if (limit > 100) {
+        return res.status(400).json({ message: 'Limit cannot exceed 100' });
+    }
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    const stores = await Stores.find().skip(startIndex).limit(limit);
+    const totalStores = await Stores.countDocuments();
+
+    const pagination = {
+        currentPage: page,
+        totalPages: Math.ceil(totalStores / limit),
+        totalStores: totalStores
+    };
+
+    res.json({ status: 'success', stores: stores, pagination: pagination });
 }

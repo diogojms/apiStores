@@ -32,10 +32,10 @@ function isAdmin(req, res, next) {
         res.status(403).json()
 }
 
-router.post('/CreateStore', checkToken, isAdmin, storeController.CreateStore);
-router.post('/EditStore', checkToken, isAdmin, storeController.EditStore);
-router.post('/RemoveStore', checkToken, isAdmin, storeController.RemoveStore);
-router.get('/ReadStore', checkToken, storeController.ReadStore);
-router.get('/ReadStores', checkToken, storeController.ReadStores);
+router.post('/', checkToken, isAdmin, storeController.CreateStore);
+router.put('/', checkToken, isAdmin, storeController.EditStore);
+router.delete('/', checkToken, isAdmin, storeController.RemoveStore);
+router.get('/:id', checkToken, storeController.ReadStore);
+router.get('/', checkToken, storeController.ReadStores);
 
 module.exports = router;
