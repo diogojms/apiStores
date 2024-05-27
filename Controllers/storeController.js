@@ -329,6 +329,11 @@ exports.ReadStores = async (req, res) => {
 }
 
 exports.CountStores = async (req, res) => {
-    const count = await Stores.countDocuments();
-    res.json({ count });
-}
+    try {
+      const totalStores = await Store.countDocuments();
+      res.json({ status: 200, message: 'Count retrieved successfully', data: { totalStores } });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ status: 500, message: 'Error counting stores', data: {} });
+    }
+};
