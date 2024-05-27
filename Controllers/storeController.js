@@ -327,3 +327,8 @@ exports.ReadStores = async (req, res) => {
 
     res.json({ status: 'success', stores: stores, pagination: pagination });
 }
+
+exports.CountStores = async (req, res) => {
+    const count = await Stores.countDocuments();
+    res.json({ count });
+}
