@@ -309,31 +309,32 @@ exports.ReadStore = async (req, res) => {
  */
 exports.ReadStores = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    if (limit > 100) {
-        return res.status(400).json({ message: 'Limit cannot exceed 100' });
-    }
+    const limit = parseInt(req.query.limit) || Number.MAX_SAFE_INTEGER;
     const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
 
-    const stores = await Stores.find().skip(startIndex).limit(limit);
-    const totalStores = await Stores.countDocuments();
+    try {
+        const stores = await Stores.find().skip(startIndex).limit(limit);
+        const totalStores = await Stores.countDocuments();
 
-    const pagination = {
-        currentPage: page,
-        totalPages: Math.ceil(totalStores / limit),
-        totalStores: totalStores
-    };
+        const pagination = {
+            currentPage: page,
+            totalPages: Math.ceil(totalStores / limit),
+            totalStores: totalStores,
+        };
 
-    res.json({ status: 'success', stores: stores, pagination: pagination });
-}
+        res.json({ status: "success", stores: stores, pagination: pagination });
+    } catch (error) {
+        res.status(500).json({ status: "error", message: error.message });
+    }
+};
+
 
 exports.CountStores = async (req, res) => {
     try {
-      const totalStores = await Store.countDocuments();
-      res.json({ status: 200, message: 'Count retrieved successfully', data: { totalStores } });
+        const totalStores = await Store.countDocuments();
+        res.json({ status: 200, message: 'Count retrieved successfully', data: { totalStores } });
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ status: 500, message: 'Error counting stores', data: {} });
+        console.error(error);
+        res.status(500).json({ status: 500, message: 'Error counting stores', data: {} });
     }
 };
